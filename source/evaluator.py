@@ -1,4 +1,6 @@
 from decision_tree import DecisionTree
+import json
+from datetime import datetime
 
 class UserProfile:
     def __init__(self, name, prefs, expected):
@@ -73,3 +75,33 @@ class Evaluator:
 
         score = correct / len(self.TEST_PROFILES)
         return out, score
+
+    def write_text_report(self, path="report.txt"):
+        lines = []
+        lines.append("Digital Signature Decision Tree - Evaluation Report\n")
+        lines.append(f"Generated: {datetime.now()}\n")
+        lines.append("=" * 60 + "\n")
+
+        results, score = self.run()
+
+        for r in results:
+            lines.append(f"Profile: {r['profile']}\n")
+            lines.append(f"Expected: {r['expected']}\n")
+            lines.append(f"Actual: {r['actual']}\n")
+            lines.append(f"Correct: {r['correct']}\n")
+            lines.append("\n")
+
+        lines.append(f"Success Probability: {score:.2%}\n")
+
+        with open(path, "w") as f:
+            f.writelines(lines)
+
+    def write_json_report(self, path="report.json"):
+        results, score = self.run()
+        data = {
+            "timestamp": datetime.now().isoformat(),
+            "success_probability": score,
+            "results": results
+        }
+        with open(path, "w") as f:
+            json.dump(data, f, indent=2)
