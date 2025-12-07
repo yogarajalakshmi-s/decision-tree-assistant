@@ -1,7 +1,6 @@
-Scheme Name,Security Assumption,Signature Size (bits),Signing Complexity,Complexity Category,Standardized,Construction Type,Hardware Optimized
-Hashed RSA (RSA-FDH),RSA,2048-4096,High,High,Yes,Hash-and-Sign,No
-Schnorr,Signed Discrete Log,320-512,Low,Low,Yes,Fiat-Shamir,No
-DSA,Discrete Log,320-1024,Medium,Medium,Yes,Number-Theoretic,No
-ECDSA,Elliptic Curve DL,256-512,Low,Low,Yes,Elliptic Curve,Yes
-Lamport (OTS),One-Way Hash,8192-16384,Low,High,No,One-Time,No
-Merkle Tree (Hash-Based),One-Way Hash,1024-8192,Medium,Medium,No,Tree-Based,No
+Scheme Name,Security Assumption,Signing Complexity,Verification Complexity,Key Size (bits),Signature Size (bits),One-Time Only,Standardized,Construction Type,Complexity Category,Hardware Optimized
+Hashed RSA (RSA-FDH),RSA Hardness,O(log n) modular exponentiation,O(log n) modular exponentiation,2048-4096,2048-4096,No,Yes,Hash-and-Sign,Medium,Yes
+Schnorr Signatures,Discrete Log Problem,O(log q) modular exponentiation,O(log q) modular exponentiation + hash,1024-2048,320-512,No,No,Fiat-Shamir Transform,Medium,Yes
+DSA,Discrete Log Problem,O(log q) modular exponentiation,2x O(log q) modular exponentiation,1024-2048,320-512,No,Yes,Number-Theoretic,Medium,Yes
+ECDSA,Elliptic Curve Discrete Log,Scalar multiplication,2x Scalar multiplication,256-521,512-1042,No,Yes,Elliptic Curve,Medium,Yes
+Lamport + Merkle Tree,One-Way Hash Function,Hash computations,Hash computations + tree verification,2048-4096,256-512,No,No,Hash-Based Tree,Low,No

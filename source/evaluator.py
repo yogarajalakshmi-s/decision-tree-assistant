@@ -24,11 +24,11 @@ class Evaluator:
         UserProfile(
             "standardization",
             prefs={"standardized": True},
-            expected="DSA"
+            expected="ECDSA"
         ),
         UserProfile(
             "fiat_shamir",
-            prefs={"construction": "Fiat-Shamir"},
+            prefs={"construction": "Fiat-Shamir Transform"},
             expected="Schnorr Signatures"
         ),
     ]
@@ -105,3 +105,14 @@ class Evaluator:
         }
         with open(path, "w") as f:
             json.dump(data, f, indent=2)
+
+if __name__ == "__main__":
+    CSV_PATH = "../data/signature_schemes.csv"
+
+    evaluator = Evaluator(CSV_PATH)
+    results, score = evaluator.run()
+    evaluator.write_text_report()
+    evaluator.write_json_report()
+
+    print("\nEvaluation Complete.")
+    print(f"Success Probability: {score:.2%}")

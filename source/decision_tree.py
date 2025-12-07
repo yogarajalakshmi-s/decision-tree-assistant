@@ -82,12 +82,18 @@ class DecisionTree:
             return None
         if len(self.current_candidates) == 1:
             return self.current_candidates[0]["Scheme Name"]
-        # If multiple, choose best by lowest complexity
-        sorted_list = sorted(
-            self.current_candidates,
-            key=lambda x: ["Low", "Medium", "High"].index(x["Complexity Category"])
-        )
-        return sorted_list[0]["Scheme Name"]
+
+        # Priority: pick by Complexity Category (Low > Medium > High)
+        # Then by Standardized (Yes > No)
+        # Then by smallest signature size
+
+        def score(scheme):
+            complexity_score = ["Low", "Medium", "High"].index(scheme["Complexity Category"])
+            standardized_score = 0 if scheme["Standardized"].lower() == "yes" else 1
+            sig_size = int(scheme["Signature Size (bits)"].split("-")[1])  # max size
+            return (complexity_score, standardized_score, sig_size)
+
+        return sorted(self.current_candidates, key=score)[0]["Scheme Name"]
 
     def get_remaining_candidates(self):
         return [s["Scheme Name"] for s in self.current_candidates]
