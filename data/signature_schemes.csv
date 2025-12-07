@@ -1,0 +1,7 @@
+Scheme Name,Security Assumption,Signature Size (bits),Signing Complexity,Complexity Category,Standardized,Construction Type,Hardware Optimized
+Hashed RSA (RSA-FDH),RSA,2048-4096,High,High,Yes,Hash-and-Sign,No
+Schnorr,Signed Discrete Log,320-512,Low,Low,Yes,Fiat-Shamir,No
+DSA,Discrete Log,320-1024,Medium,Medium,Yes,Number-Theoretic,No
+ECDSA,Elliptic Curve DL,256-512,Low,Low,Yes,Elliptic Curve,Yes
+Lamport (OTS),One-Way Hash,8192-16384,Low,High,No,One-Time,No
+Merkle Tree (Hash-Based),One-Way Hash,1024-8192,Medium,Medium,No,Tree-Based,No
