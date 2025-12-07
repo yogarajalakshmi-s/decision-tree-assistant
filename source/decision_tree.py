@@ -44,3 +44,35 @@ class DecisionTree:
                 filtered.append(s)
 
         self.current_candidates = filtered
+
+    def filter_by_standardization(self, wants_std: bool):
+        filtered = []
+        for s in self.current_candidates:
+            is_std = s["Standardized"].strip().lower() == "yes"
+            if wants_std == is_std:
+                filtered.append(s)
+        self.current_candidates = filtered
+
+
+    def filter_by_construction_type(self, ctype: str):
+        filtered = []
+        for s in self.current_candidates:
+            if ctype.lower() in s["Construction Type"].lower():
+                filtered.append(s)
+        self.current_candidates = filtered
+
+
+    def filter_by_efficiency(self, level: str):
+        # level is fast, normal or any
+        filtered = []
+        for s in self.current_candidates:
+            complexity = s["Complexity Category"]
+
+            if level == "fast" and complexity in ["Low"]:
+                filtered.append(s)
+            elif level == "normal" and complexity in ["Low", "Medium"]:
+                filtered.append(s)
+            elif level == "any":
+                filtered.append(s)
+
+        self.current_candidates = filtered
