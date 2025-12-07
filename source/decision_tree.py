@@ -76,3 +76,19 @@ class DecisionTree:
                 filtered.append(s)
 
         self.current_candidates = filtered
+
+    def get_recommendation(self):
+        if not self.current_candidates:
+            return None
+        if len(self.current_candidates) == 1:
+            return self.current_candidates[0]["Scheme Name"]
+        # If multiple, choose best by lowest complexity
+        sorted_list = sorted(
+            self.current_candidates,
+            key=lambda x: ["Low", "Medium", "High"].index(x["Complexity Category"])
+        )
+        return sorted_list[0]["Scheme Name"]
+
+    def get_remaining_candidates(self):
+        return [s["Scheme Name"] for s in self.current_candidates]
+
