@@ -14,7 +14,7 @@ class Evaluator:
         UserProfile(
             "efficiency_focused",
             prefs={"signature_size": "short"},
-            expected="ECDSA"
+            expected="Lamport + Merkle Tree"
         ),
         UserProfile(
             "hash_based",
@@ -24,7 +24,7 @@ class Evaluator:
         UserProfile(
             "standardization",
             prefs={"standardized": True},
-            expected="ECDSA"
+            expected="DSA"
         ),
         UserProfile(
             "fiat_shamir",
