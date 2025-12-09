@@ -1,0 +1,24 @@
+Digital Signature Decision Tree - Evaluation Report
+Generated: 2025-12-08 19:46:27.486152
+============================================================
+Profile: efficiency_focused
+Expected: Lamport + Merkle Tree
+Actual: Lamport + Merkle Tree
+Correct: True
+
+Profile: hash_based
+Expected: Lamport + Merkle Tree
+Actual: Lamport + Merkle Tree
+Correct: True
+
+Profile: standardization
+Expected: DSA
+Actual: DSA
+Correct: True
+
+Profile: fiat_shamir
+Expected: Schnorr Signatures
+Actual: Schnorr Signatures
+Correct: True
+
+Success Probability: 100.00%

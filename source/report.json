@@ -1,0 +1,30 @@
+{
+  "timestamp": "2025-12-08T19:46:27.486749",
+  "success_probability": 1.0,
+  "results": [
+    {
+      "profile": "efficiency_focused",
+      "expected": "Lamport + Merkle Tree",
+      "actual": "Lamport + Merkle Tree",
+      "correct": true
+    },
+    {
+      "profile": "hash_based",
+      "expected": "Lamport + Merkle Tree",
+      "actual": "Lamport + Merkle Tree",
+      "correct": true
+    },
+    {
+      "profile": "standardization",
+      "expected": "DSA",
+      "actual": "DSA",
+      "correct": true
+    },
+    {
+      "profile": "fiat_shamir",
+      "expected": "Schnorr Signatures",
+      "actual": "Schnorr Signatures",
+      "correct": true
+    }
+  ]
+}

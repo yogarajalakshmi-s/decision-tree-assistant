@@ -1,426 +1,201 @@
-# Decision Tree Assistant for Selecting Digital Signature Scheme [Project 2.6]
-## Overview
+# Decision Tree Assistant for Selecting Digital Signature Schemes
 
-This project implements a decision tree-based assistant that helps non-expert users select an appropriate digital signature scheme for their needs. The system uses a rule-based filtering approach to narrow down choices based on user preferences and constraints.
+## Project Overview
+
+This project implements an interactive decision tree system to help non-expert users select the most appropriate digital signature scheme for their specific needs. The system guides users through simple questions and recommends the best scheme based on their preferences.
+
+## Problem Statement
+
+Choosing the right digital signature scheme is challenging for users without cryptography expertise. Different schemes have different tradeoffs in terms of signature size, computational efficiency, standardization, and security assumptions. This project simplifies that selection process.
+
+## Solution
+
+An interactive CLI-based decision tree that:
+- Asks 4 adaptive questions about user preferences
+- Filters schemes based on answers
+- Recommends the best matching scheme
+- Displays full scheme details and alternatives
+- Handles uncertainty ("don't know" responses)
+
+## Project Details
 
 **Project Type:** 2.6 - Selecting Schemes for a Given Cryptography Primitive  
 **Cryptographic Primitive:** Digital Signatures  
-**Team:** Signed and Delivered (Member: Yoga Sathyanarayanan)
+**Course:** CS-GY 6903 Applied Cryptography, Fall 2025
 
----
+## Digital Signature Schemes Included
 
-## Project Structure
+1. **Hashed RSA (RSA-FDH)** - 2048-4096 bit signatures, RSA-based, standardized
+2. **Schnorr Signatures** - 320-512 bit signatures, discrete log-based, Fiat-Shamir
+3. **DSA** - 320-512 bit signatures, discrete log-based, FIPS standardized
+4. **ECDSA** - 512-1042 bit signatures, elliptic curve-based, NIST standardized
+5. **Lamport + Merkle Tree** - 256-512 bit signatures, hash-based, post-quantum safe
 
-```
-signature_schemes_project/
-├── signature_schemes.csv          # Implementation usage table (5 schemes, 10 columns)
-├── decision_tree.py               # Core decision tree logic and filtering rules
-├── cli_interface.py               # Interactive command-line interface for users
-├── evaluator.py                   # Testing framework and evaluation metrics
-├── README.md                      # This file
-└── test_results.txt              # Generated evaluation report
-```
+## Implementation Usage Table
 
----
+The system uses a CSV table with 5 schemes and 10 properties:
 
-## Key Features
+| Property | Description |
+|----------|-------------|
+| Scheme Name | Identifier |
+| Security Assumption | Mathematical hardness assumption |
+| Key Size | Cryptographic key length |
+| Signature Size | Generated signature length |
+| Standardized | Official approval (NIST, FIPS, etc.) |
+| Construction Type | Mathematical construction method |
+| Complexity Category | Computational cost (Low/Medium/High) |
+| Hardware Optimized | Hardware acceleration support |
+| Signing Complexity | Cost to create signature |
+| Verification Complexity | Cost to verify signature |
 
-### 1. Implementation Usage Table (`signature_schemes.csv`)
+## System Architecture
 
-Contains 5 digital signature schemes with 10 properties each:
+### 4 Main Components
 
-**Schemes Included:**
-- Hashed RSA (RSA-FDH)
-- Schnorr Signatures
-- DSA (Digital Signature Algorithm)
-- ECDSA (Elliptic Curve DSA)
-- Lamport + Merkle Tree (Hash-based)
+**1. signature_schemes.csv**
+- Data layer containing all 5 schemes and their 10 properties
+- Loaded and used by decision_tree.py
 
-**Properties/Columns:**
-1. **Scheme Name** - Identifier
-2. **Security Assumption** - What hard problem it's based on
-3. **Signing Complexity** - Computational cost to sign
-4. **Verification Complexity** - Computational cost to verify
-5. **Key Size (bits)** - Size of cryptographic keys
-6. **Signature Size (bits)** - Size of generated signatures
-7. **One-Time Only** - Whether scheme supports multiple signatures
-8. **Standardized** - Whether it's officially standardized
-9. **Construction Type** - How the scheme is built (NEW - added column)
-10. **Complexity Category** - Relative complexity level (NEW - added column)
-11. **Hardware Optimized** - Whether it supports hardware acceleration
+**2. decision_tree.py**
+- Core filtering logic (~300 lines)
+- Filtering methods:
+  - `filter_by_signature_size(preference)`
+  - `filter_by_security_assumption(assumption)`
+  - `filter_by_standardization(wants_std)`
+  - `filter_by_construction_type(ctype)`
+  - `filter_by_efficiency(level)`
+- Returns best recommendation based on priority:
+  1. Lowest complexity category
+  2. Standardized (if tied)
+  3. Smallest signature size (if tied)
 
-**New Columns Added (Beyond Lecture Materials):**
-- **Complexity Category:** Categorizes schemes as Low/Medium complexity
-- **Hardware Optimized:** Indicates which schemes support hardware optimization
+**3. cli_interface.py**
+- Interactive user interface (~200 lines)
+- Asks 4 questions:
+  1. Do you need short signatures?
+  2. Do you prefer standardized schemes?
+  3. What construction type interests you?
+  4. Do you prioritize computational efficiency?
+- Supports yes/no/don't-know responses
+- Displays recommendation with full scheme details
 
-### 2. Decision Tree (`decision_tree.py`)
+**4. evaluator.py**
+- Testing framework (~350 lines)
+- Tests 4 user profiles:
+  1. Efficiency-focused (wants short signatures)
+  2. Hash-based advocate (wants hash-based security)
+  3. Standardization seeker (wants standardized schemes)
+  4. Fiat-Shamir enthusiast (wants Fiat-Shamir construction)
+- Calculates success probability
+- Generates text and JSON reports
 
-A rule-based filtering system that narrows down scheme options:
+## How to Use
 
-**Filtering Methods:**
-- `filter_by_signature_size()` - Short (≤512 bits) vs medium vs long
-- `filter_by_security_assumption()` - RSA, Discrete Log, Elliptic Curve, Hash
-- `filter_by_standardization()` - Standardized schemes only
-- `filter_by_construction_type()` - Hash-and-Sign, Fiat-Shamir, Number-Theoretic, etc.
-- `filter_by_efficiency()` - Fast, standard, or unconstrained
-- `filter_by_hardware_optimization()` - Hardware-optimized schemes
-
-**How It Works:**
-1. Load all 5 schemes as candidates
-2. Ask users questions about their preferences
-3. Apply corresponding filters to eliminate incompatible schemes
-4. Return recommendation when candidates narrow sufficiently
-
-**Key Design Decision:**
-Uses *rule-based* filtering rather than ML because the goal is clarity for non-experts. Each filter directly corresponds to a table property.
-
-### 3. Interactive CLI Interface (`cli_interface.py`)
-
-A user-friendly command-line program that guides non-experts through scheme selection:
-
-**Features:**
-- Adaptive questioning (questions change based on remaining candidates)
-- Multiple question formats: yes/no, multiple-choice
-- "Don't know" option for uncertain answers
-- Clear explanations of recommendations
-- Detailed scheme information display
-- Option to restart and try again
-
-**Question Flow:**
-1. **Q1: Signature Size** - "Do you need SHORT signatures?"
-2. **Q2: Standardization** - "Do you want a STANDARDIZED scheme?"
-3. **Q3: Construction Type** - "What construction type interests you?"
-4. **Q4: Efficiency** - "How important is computational efficiency?"
-
-**Adaptive Behavior:**
-- Questions adjust based on remaining candidates
-- Skips questions if only few schemes remain
-- Gracefully handles "don't know" responses
-- Resets filters if no schemes match to find viable path
-
-### 4. Evaluation Framework (`evaluator.py`)
-
-Tests the decision tree against 4 predefined user profiles:
-
-**Test Profiles (from Proposal):**
-
-1. **efficiency_focused**
-   - Wants shortest signatures
-   - Expected: ECDSA
-
-2. **hash_based_advocate**
-   - Wants simplest hash-based construction
-   - Expected: Lamport + Merkle Tree
-
-3. **standardization_seeker**
-   - Wants widely standardized scheme
-   - Expected: DSA or ECDSA
-
-4. **fiat_shamir_enthusiast**
-   - Wants Fiat-Shamir based scheme
-   - Expected: Schnorr Signatures
-
-**Metrics Calculated:**
-- **Choice Correctness Success Probability** = (Correct Recommendations) / (Total Tests)
-- Target: ≥ 80% accuracy
-
-**Output:**
-- Console summary with pass/fail for each test
-- Detailed text report (`test_results.txt`)
-- JSON report for further analysis (`test_results.json`)
-
----
-
-## How to Run
-
-### Prerequisites
-- Python 3.6+
-- No external dependencies (uses only standard library)
-
-### Quick Start
-
-#### 1. Interactive Mode (Run the Assistant)
+### Running the Interactive CLI
 ```bash
-python cli_interface.py
+python3 cli_interface.py
 ```
 
-This launches the interactive wizard where you answer questions and get a recommendation.
-
-**Example Session:**
+Answer the 4 questions interactively. Example:
 ```
-❓ How important is having SHORT signatures to you?
-   Options: [y]es, [n]o, [?]don't know
-   Your answer: y
+Do you need SHORT signatures?
+[y]es / [n]o / [?]don't know: y
+→ Filtering for short signatures...
 
-   → Filtering for schemes with signatures ≤ 512 bits...
+Do you prefer STANDARDIZED schemes?
+[y]es / [n]o / [?]don't know: y
+→ Filtering for standardized schemes...
 
-❓ Do you prefer STANDARDIZED and widely-used schemes?
-   Your answer: y
-
-   → Filtering for standardized schemes...
-
-RECOMMENDATION: ECDSA
-
-Details about ECDSA:
-   • Security Based On: Elliptic Curve Discrete Log
-   • Signature Size: 512-1042 bits
-   • Key Size: 256-521 bits
-   • Standardized: Yes
-   • Construction: Elliptic Curve
-   • Complexity Level: Medium
+RECOMMENDATION: DSA
+Details:
+  • Security: Discrete Log Problem
+  • Signature Size: 320-512 bits
+  • Standardized: Yes
+  • Construction: Number-Theoretic
+  • Complexity: Medium
 ```
 
-#### 2. Run Evaluation Tests
+### Running the Evaluator
 ```bash
-python evaluator.py
+python3 evaluator.py
 ```
 
-Tests the decision tree against 4 user profiles and generates reports:
-- Prints pass/fail summary to console
-- Generates `test_results.txt` with detailed results
-- Generates `test_results.json` for analysis
+Output shows:
+- Results for all 4 test profiles
+- Success probability (target: ≥80%)
+- Generates `report.txt` and `report.json`
 
-**Expected Output:**
+## Decision Tree Logic
+
+### Example: User wants short signatures + standardized
 ```
-EVALUATION: Decision Tree Performance
-============================================================
-
-📋 Testing Profile: efficiency_focused
-   Description: User wants shortest possible signatures
-   Expected Recommendation: ECDSA
-   Actual Recommendation: ECDSA
-   ✅ CORRECT
-
-[... 3 more tests ...]
-
-SUMMARY
-============================================================
-Total Test Cases: 4
-Correct Recommendations: 4
-Choice Correctness Success Probability: 100.0%
+Start: [RSA, Schnorr, DSA, ECDSA, Lamport]
+  ↓ Filter: Signature Size ≤ 512 bits
+Intermediate: [Schnorr, DSA, Lamport]
+  ↓ Filter: Standardized = Yes
+Final: [DSA]
+  ↓ Recommendation: DSA
 ```
 
-### File Verification
-```bash
-# List all required files
-ls -la signature_schemes.csv decision_tree.py cli_interface.py evaluator.py
+## Requirements Met
+
+- Cryptographic Primitive: Digital Signatures (5 schemes)
+- Implementation Usage Table: 5 rows × 10 columns (8+ required)
+- 2 New Columns: Complexity Category, Hardware Optimized
+- Decision Tree Code: Rule-based filtering with 5 methods
+- Non-Expert Interface: Interactive CLI with simple questions
+- Input from Table: All filters read CSV properties
+- Questions at Decision Nodes: 4 adaptive questions
+- Meaningful Success Metric: 100% (4/4 tests passing)
+- Software Implementation: 850+ lines of well-documented code
+
+## File Structure
 ```
+project/
+├── data/
+   ├── signature_schemes.csv          # Data table (5 schemes × 10 properties)
+├── source/
+   ├── decision_tree.py               # Core filtering logic
+   ├── cli_interface.py               # Interactive user interface
+   ├── evaluator.py                   # Testing framework
+   ├── report.txt                     # Text evaluation report
+   ├── report.json                    # JSON evaluation report
+└── README.md                      # This file
+```
+
+## Technical Details
+
+- **Language:** Python 3.6+
+- **Dependencies:** None (standard library only)
+- **CSV Parsing:** csv.DictReader
+- **Code Structure:** Object-oriented design with clear separation of concerns
+- **Testing:** Scripted user profiles with automated evaluation
+
+## Key Design Decisions
+
+1. **Rule-based filtering (not ML):** Provides transparency - users understand why they got each recommendation
+
+2. **Priority ranking:** Complexity first, then standardization, then signature size - prioritizes computational efficiency
+
+3. **Uncertainty handling:** "Don't know" option skips filters, allowing users to express incomplete preferences
+
+4. **Adaptive questions:** System only asks relevant questions based on remaining candidates
+
+5. **CSV-based scheme storage:** Easy to add new schemes without code changes
+
+## Learning Outcomes
+
+- Structured approach to complex decision problems
+- Importance of well-designed property tables
+- User experience in cryptography tool design
+- Testing and evaluation methodology
+- Rule-based system design
+
+## License
+
+Educational project for NYU CS-GY 6903 Applied Cryptography course.
 
 ---
 
-## Design Methodology
-
-### Step 1: Cryptographic Primitive Selection
-Chose **Digital Signatures** from Lecture 9 coverage, specifically 5 complementary schemes:
-- 3 number-theoretic (RSA, DSA, Schnorr)
-- 1 elliptic curve (ECDSA)
-- 1 hash-based (Lamport+Merkle)
-
-This diversity ensures the decision tree has meaningful distinctions to make.
-
-### Step 2: Implementation Usage Table
-Built CSV with schemes as rows and properties as columns:
-- Properties directly from lecture materials (key/signature size, complexity, etc.)
-- **Added 2 columns** beyond lecture tables:
-  - Complexity Category: Categorizes relative computational complexity
-  - Hardware Optimized: Practical deployment consideration
-
-### Step 3: Decision Tree Logic
-Implemented rule-based filtering that:
-1. Starts with all 5 schemes as candidates
-2. Applies filters based on user answers
-3. Narrows down to single recommendation
-4. Handles uncertainty gracefully
-
-Each filter method directly maps to a table column, ensuring validity.
-
-### Step 4: Interactive CLI
-Created user-friendly interface that:
-- Asks yes/no and multiple-choice questions
-- Adapts based on remaining candidates
-- Provides detailed explanations
-- Allows users to restart easily
-
-### Step 5: Evaluation
-Tested with 4 user profiles covering the design space:
-- Each profile represents a different "archetype" of user need
-- Metrics verify the tree makes correct recommendations
-- Success probability ≥ 80% target
-
----
-
-## Grading Rubric Alignment
-
-| Criterion | How We Address It |
-|-----------|------------------|
-| **Cryptographic Primitive Choice** | 5 diverse digital signature schemes from Lecture 9 |
-| **Table Specification Validity** | CSV with 5 rows (schemes), 10 columns (8+ required), 2 new columns |
-| **Decision Tree Validity** | Rule-based logic; each filter maps to table column |
-| **Program Validity** | Interactive CLI asks meaningful questions, outputs correct recommendations |
-| **Implementation Validity** | Python code loads CSV, filters candidates, outputs recommendations; tested with 4 profiles |
-| **Demonstration/Presentation Quality** | This README + CLI demo + evaluation report |
-
----
-
-## Example Use Cases
-
-### Use Case 1: Performance-Critical Application
-User: "I need signatures for high-frequency trading where speed matters."
-
-**System Response:**
-1. Asks about signature size importance → User says "Yes"
-2. Filters to schemes with small signatures
-3. Asks about standardization → User says "Yes"
-4. **Recommends: ECDSA** (small signatures, standardized, efficient)
-
-### Use Case 2: Hash-Based Preference
-User: "I only want to rely on cryptographic hash functions."
-
-**System Response:**
-1. Asks about signature size → User indifferent
-2. Asks about standardization → User indifferent
-3. Asks about construction type → User selects "Hash-Based Tree"
-4. **Recommends: Lamport + Merkle Tree**
-
-### Use Case 3: Regulatory Requirement
-User: "My organization's standard requires NIST-approved schemes."
-
-**System Response:**
-1. Asks about standardization → User says "Yes"
-2. Filters to standardized schemes
-3. Asks about efficiency → User says "Not critical"
-4. **Recommends: DSA or ECDSA** (both NIST-approved)
-
----
-
-## Key Implementation Details
-
-### Decision Tree Filtering Strategy
-
-The system uses **cascading filters**:
-
-```
-Start: [RSA, Schnorr, DSA, ECDSA, Lamport+Merkle]
-         ↓ (filter_by_signature_size("short"))
-       [Schnorr, ECDSA, Lamport+Merkle]
-         ↓ (filter_by_standardization(True))
-       [ECDSA, DSA]
-         ↓ (filter_by_efficiency("fast"))
-       [ECDSA]
-         ↓
-Result: ECDSA ✓
-```
-
-### Handling Uncertainty
-
-When users answer "don't know":
-- Filter is not applied
-- All current candidates persist
-- System continues with remaining filters
-- If no schemes match after a filter, previous filter is reversed
-
-### Adaptive Questioning
-
-```python
-remaining = len(self.tree.current_candidates)
-if remaining > 2:
-    # Ask detailed multiple-choice question
-else:
-    # Skip detailed questions, close in on recommendation
-```
-
----
-
-## Evaluation Results
-
-Run `python evaluator.py` to see results. Expected output:
-
-```
-Total Test Cases: 4
-Correct Recommendations: 4/4 (100%)
-Choice Correctness Success Probability: 100%
-```
-
-If success probability < 80%, adjust the filtering logic in `decision_tree.py`.
-
----
-
-## Extending the System
-
-To add a new signature scheme:
-
-1. **Add row to `signature_schemes.csv`**
-   ```csv
-   New Scheme,RSA Hardness,O(...),O(...),2048,2048,No,Yes,Hash-and-Sign,Medium,Yes
-   ```
-
-2. **Update decision tree filters if needed**
-   ```python
-   # In decision_tree.py, add new filter method if necessary
-   def filter_by_new_property(self, value):
-       filtered = [s for s in self.current_candidates if ...]
-       self.current_candidates = filtered
-   ```
-
-3. **Add to CLI questions**
-   ```python
-   # In cli_interface.py, add new question to run_interview()
-   ```
-
-4. **Update test profiles**
-   ```python
-   # In evaluator.py, add new test case to TEST_PROFILES
-   ```
-
----
-
-## Performance Notes
-
-- **Program Runtime**: < 1 second to generate recommendation
-- **CSV Loading**: < 50ms
-- **Question Response Time**: Depends on user input (interactive)
-- **Evaluation Suite**: ~100ms to run all 4 tests
-
----
-
-## Troubleshooting
-
-### "CSV file not found"
-```
-Solution: Ensure signature_schemes.csv is in the same directory as the Python files
-```
-
-### "No recommendation found"
-```
-Solution: User answers narrowed down all schemes. Run evaluator.py to verify tree logic.
-         Adjust filter thresholds in decision_tree.py if needed.
-```
-
-### "Wrong scheme recommended"
-```
-Solution: Review the filtering logic for that user profile.
-         Check decision_tree.py filtering methods.
-         May need to add discriminating questions in cli_interface.py
-```
-
----
-
-## Files Reference
-
-| File | Purpose                            |
-|------|------------------------------------|
-| `signature_schemes.csv` | Data table with scheme properties  |
-| `decision_tree.py` | Core filtering logic               |
-| `cli_interface.py` | Interactive user interface         |
-| `evaluator.py` | Testing and evaluation framework   |
-| `README.md` | This documentation                 |
-
----
-
----
-
-## License & Attribution
-
-Student: Yogarajalakshmi Sathyanarayanan (ys6678)
-
----
+**Author:** Yogarajalakshmi Sathyanarayanan (ys6678)   
+**Date:** Fall 2025
