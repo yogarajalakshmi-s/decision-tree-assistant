@@ -87,7 +87,7 @@ class SignatureSchemeSelector:
 
         print("\n" + "=" * 60)
         if rec:
-            print(f"✅ RECOMMENDATION: {rec}")
+            print(f"RECOMMENDATION: {rec}")
             print(f"Alternatives: {', '.join(candidates)}")
 
             # Show details
@@ -100,7 +100,7 @@ class SignatureSchemeSelector:
                 print(f"  • Construction: {details['Construction Type']}")
                 print(f"  • Complexity: {details['Complexity Category']}")
         else:
-            print("❌ No matching schemes found.")
+            print("No matching schemes found.")
         print("=" * 60)
 
         return rec
@@ -118,7 +118,7 @@ class SignatureSchemeSelector:
             self.run_interview()
             again = input("\n\nTry another selection? [y]es / [n]o: ").lower().strip()
             if again != 'y':
-                print("\n👋 Thank you!\n")
+                print("\nThank you!\n")
                 break
 
 

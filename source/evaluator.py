@@ -106,13 +106,27 @@ class Evaluator:
         with open(path, "w") as f:
             json.dump(data, f, indent=2)
 
+
 if __name__ == "__main__":
     CSV_PATH = "../data/signature_schemes.csv"
 
     evaluator = Evaluator(CSV_PATH)
     results, score = evaluator.run()
+
+    # Print detailed results to console
+    print("\n" + "=" * 60)
+    print("EVALUATION RESULTS")
+    print("=" * 60)
+    for r in results:
+        print(f"\nProfile: {r['profile']}")
+        print(f"Expected: {r['expected']}")
+        print(f"Actual: {r['actual']}")
+        print(f"Correct: {'✅ YES' if r['correct'] else '❌ NO'}")
+
+    print("\n" + "=" * 60)
+    print(f"Success Probability: {score:.2%}")
+    print("=" * 60 + "\n")
+
+    # Also save to files
     evaluator.write_text_report()
     evaluator.write_json_report()
-
-    print("\nEvaluation Complete.")
-    print(f"Success Probability: {score:.2%}")
